@@ -9,12 +9,10 @@
     - If no improvement is possible and some vertices are still unlocked, the vertices which give the smallest increase are exchanged.
 
 - Kernighan-Lin Algorithm  
-    - The formula of `gain`: **D(x, y) = g(x, y)**    
-    
+    - The formula of `gain`: 
         $$
         \boldsymbol{D(x, y) = g(x, y) = E_x - I_x + E_y - I_y - 2c(x, y)}
         $$
-
         , where $\boldsymbol{E_x}$ **is the # of extended neighbors of x**,  
         $\boldsymbol{I_x}$ **is the # of interior neighbors of x**,   
         and $\boldsymbol{c(x, y)}$ **is the # of mutual connected lines between x and y** 
