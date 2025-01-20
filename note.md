@@ -154,9 +154,9 @@
     
         $$\text{gain(x)} = \text{good hyperedges} - \text{bad hyperedges}$$
     
-        , where $\text{good hyperedges}: \text{total number of hyperedges that contain x as the only gate at the other side}$
+        , where $\text{good hyperedges}: \text{ total number of hyperedges that contain x as the only gate at the other side}$
 
-        $\text{bad hyperedges}: \text{total number uncut hyperedges that contain x}$
+        $\text{bad hyperedges}: \text{ total number uncut hyperedges that contain x}$
 
     - **neighbour**: All gates that are contained in the hypergraphs taht contain x
 
