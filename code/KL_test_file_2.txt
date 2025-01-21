@@ -1,0 +1,14 @@
+aceg bdfh
+a c 0.5
+a e 0.5
+b c 0.5
+b d 0.5
+c d 0.5
+c e 1
+c f 0.5
+d f 1
+e f 0.5
+e g 1
+f g 0.5
+f h 0.5
+g h 0.5
