@@ -1,4 +1,4 @@
-acdg befh
+bcde afgh
 3 5
 a c e
 b c d
