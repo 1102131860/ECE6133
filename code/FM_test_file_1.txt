@@ -1,0 +1,7 @@
+acdg befh
+a c e
+b c d
+c e f
+f g h
+d f
+e g
