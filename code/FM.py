@@ -59,7 +59,7 @@ class FM_Algorithm:
                         continue
                     
                     if i == 1:
-                        self.constraints = tuple(map(int, parts)) # lowest_boud & highest_bound
+                        self.constraints = tuple(map(int, parts)) # low_boud & high_bound
                         continue
 
                     hyed = set(parts)
@@ -77,11 +77,10 @@ class FM_Algorithm:
                 p1, p2 = self.partitions[0]
                 self.cutsizes.append(self.cutsize(p1, p2)) 
                 for v in self.vertices:
-                    # when you add a new item, remove old gain firstly then add a new gain 
                     self.bucket[self.gain(v, p1, p2)].add(v)
                 
         except Exception as e:
-            print(f"Error reading file: {e}")
+            print(f"Error: {e}")
 
 
     def partionizing(self):
