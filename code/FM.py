@@ -1,6 +1,10 @@
 import argparse
 
 class FM_Algorithm:
+    # Constant Global Configuration Variables
+    CONSTRAINT_NUMBER = 2
+    PARTITION_NUMBER = 2
+
     def __init__(self, file_path):
         self.file_path = file_path
 
@@ -51,6 +55,9 @@ class FM_Algorithm:
                 for i, line in enumerate(input_file):
                     parts = line.split()
                     if i == 0:
+                        if len(parts) != FM_Algorithm.PARTITION_NUMBER:
+                            print(f"Parition error: The inital parition is not equal for {line}")
+                            break
                         vertices = set(''.join(parts))
                         self.vertices = vertices
                         for v in vertices:
@@ -59,6 +66,9 @@ class FM_Algorithm:
                         continue
                     
                     if i == 1:
+                        if len(parts) != FM_Algorithm.PARTITION_NUMBER:
+                            print(f"Constraints error: the number of low bound and high bound {line}")
+                            break
                         self.constraints = tuple(map(int, parts)) # low_boud & high_bound
                         continue
 
@@ -134,6 +144,9 @@ class FM_Algorithm:
                     update_gain = self.gain(v, p1, p2)  # then add new gain
                     self.bucket[update_gain].add(v)
 
+            # just for testing
+            print(f"Move {len(self.vertices) - len(unlocked_vertices)}. bucket: {self.bucket}")
+
             # Record the results
             self.partitions.append((p1.copy(), p2.copy()))
             self.cutsizes.append(self.cutsize(p1, p2))
@@ -150,10 +163,11 @@ if __name__ == "__main__":
     # construct an object
     FM = FM_Algorithm(args.file_path)
 
-    FM.initialize()
-
     print("********************************************************************************")
     print("Initialization:")
+
+    FM.initialize()
+
     print(f"Degree: {FM.degree}")
     print(f"Vertices: {FM.vertices}")
     print(f"Constraints: {FM.constraints}")
@@ -161,12 +175,15 @@ if __name__ == "__main__":
     print(f"Graph: {FM.graph}")
     print(f"Bucket: {FM.bucket}")
     print(f"Partitions: {FM.partitions}")
-    print(f"Cutsizes: {FM.cutsizes}")    
+    print(f"Cutsizes: {FM.cutsizes}")
+
+    print("\n********************************************************************************")
+    print("Partitioning:")
 
     FM.partionizing()
     
     print(f"\n*******************************************************************************")
-    print("Partitioning:")
+    print("Summary:")
     # show the partitionized results
     for i in range(len(FM.partitions)):
         print(f"Iteration {i}. partitions: {FM.partitions[i]}, cutsizes: {FM.cutsizes[i]}")
