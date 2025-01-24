@@ -1,4 +1,5 @@
 import argparse
+from Bucket import Bucket
 
 class FM_Algorithm:
     # Constant Global Configuration Variables
@@ -13,10 +14,10 @@ class FM_Algorithm:
         self.constraints = tuple()
         self.vertices = set()
         self.hyperedges = list()
-        self.graph = dict()
+        self.neigbors = dict()
 
-        # bucket structure
-        self.bucket = dict()
+        # bucket structure (self_built bucket)
+        self.bucket = Bucket()
 
         # result records
         self.partitions = list()
@@ -61,7 +62,7 @@ class FM_Algorithm:
                         vertices = set(''.join(parts))
                         self.vertices = vertices
                         for v in vertices:
-                            self.graph[v] = set()
+                            self.neigbors[v] = set()
                         self.partitions.append(tuple(map(set, parts))) # tuple up the sets
                         continue
                     
@@ -75,19 +76,19 @@ class FM_Algorithm:
                     hyed = set(parts)
                     self.hyperedges.append(hyed)
                     for v in parts:
-                        self.graph[v] |= hyed - {v} # union up neigbours (except v)
+                        self.neigbors[v] |= hyed - {v} # union up neigbours (except v)
 
-                # initialize bucket with self.degree
+                # fill degree
                 degree = (len(self.hyperedges) + 1) // 2
                 self.degree = degree
-                for gain in range(-degree, degree): 
-                    self.bucket[gain] = set()
 
-                # fill cutsizes and initialized bucket
+                # fill cutsizes 
                 p1, p2 = self.partitions[0]
                 self.cutsizes.append(self.cutsize(p1, p2)) 
+
+                # initialize bucket
                 for v in self.vertices:
-                    self.bucket[self.gain(v, p1, p2)].add(v)
+                    self.bucket.insert(v, self.gain(v, p1, p2))
                 
         except Exception as e:
             print(f"Error: {e}")
@@ -99,25 +100,20 @@ class FM_Algorithm:
         p1, p2 = self.partitions[0]
 
         while unlocked_vertices:
-            max_gain_vertice = None
-            max_gain = max((k for k, v in self.bucket.items() if v), default=None)
+            max_gain, max_gain_vertice = self.bucket.pop()
+            invalid_pop_items = [] # store invalid_pop_items
 
-            # find max_gain_vertice
+            # find valid max_gain_vertice
             while max_gain is not None:
-                max_gain_vertices = self.bucket[max_gain]
-
-                for v in sorted(max_gain_vertices): # based on alphabetical order
-                    if v in unlocked_vertices: # should in the unlocked_vertices
-                        if v in p1 and low_bound < len(p1) and high_bound > len(p2) or \
-                            v in p2 and low_bound < len(p2) and high_bound > len(p1): # ensure the area constraint
-                            max_gain_vertice = v
-                            break
-                
-                if max_gain_vertice is not None:
+                if max_gain_vertice in p1 and low_bound < len(p1) and high_bound > len(p2) or \
+                    max_gain_vertice in p2 and low_bound < len(p2) and high_bound > len(p1): # ensure area constraints
+                    # Add those invalid_max_gain_vertices into bucket again
+                    for gain, v in invalid_pop_items:
+                        self.bucket.insert(v, gain)
                     break
-                
-                # find the second max gain
-                max_gain = max((k for k, v in self.bucket.items() if v and k < max_gain), default=None)
+                else:
+                    invalid_pop_items.append((max_gain, max_gain_vertice))
+                    max_gain, max_gain_vertice = self.bucket.pop()
 
             # move the selected vertice into opposite partition
             if max_gain_vertice in p1:
@@ -130,22 +126,15 @@ class FM_Algorithm:
             # lock the selected vertice
             unlocked_vertices.remove(max_gain_vertice)
 
-            # remove max_gain_vertice from self.bucket
-            self.bucket[max_gain].remove(max_gain_vertice)
-
             # update the unclocked neigbours' gain
-            neigbours = self.graph[max_gain_vertice]
+            neigbours = self.neigbors[max_gain_vertice]
             for v in neigbours:
-                if v in unlocked_vertices: # should in the unlocked_vertices
-                    for gain, vs in self.bucket.items():
-                        if v in vs:
-                            self.bucket[gain].remove(v) # firstly remove neighbour from the old gain
-                    
-                    update_gain = self.gain(v, p1, p2)  # then add new gain
-                    self.bucket[update_gain].add(v)
+                if v in unlocked_vertices: # ensure don't need to update the locked vertice
+                    self.bucket.update_priority(v, self.gain(v, p1, p2))
 
             # just for testing
-            print(f"Move {len(self.vertices) - len(unlocked_vertices)}. bucket: {self.bucket}")
+            print(f"max_gain: {max_gain}; max_gain_vertice: {max_gain_vertice}")
+            print(f"Move {len(self.vertices) - len(unlocked_vertices)}. bucket: {self.bucket.heap}")
 
             # Record the results
             self.partitions.append((p1.copy(), p2.copy()))
@@ -172,8 +161,8 @@ if __name__ == "__main__":
     print(f"Vertices: {FM.vertices}")
     print(f"Constraints: {FM.constraints}")
     print(f"Hyperedges: {FM.hyperedges}")
-    print(f"Graph: {FM.graph}")
-    print(f"Bucket: {FM.bucket}")
+    print(f"Neighbours: {FM.neigbors}")
+    print(f"Bucket: {FM.bucket.heap}")
     print(f"Partitions: {FM.partitions}")
     print(f"Cutsizes: {FM.cutsizes}")
 
@@ -187,5 +176,4 @@ if __name__ == "__main__":
     # show the partitionized results
     for i in range(len(FM.partitions)):
         print(f"Iteration {i}. partitions: {FM.partitions[i]}, cutsizes: {FM.cutsizes[i]}")
-    for i in range(len(FM.max_gains)):
-        print(f"Move {i+1}: {FM.max_moves[i]}, gain: {FM.max_gains[i]}")
+    
