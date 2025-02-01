@@ -429,3 +429,249 @@
             - {a, c, e, g} and {b, d, f, h}, {a, b, c, e} and {d, f, h, g} are more balanced than {a, b, c, e, g} and {f, g, h}
 
 
+# Polish Expression
+
+Partitioning leads to 
+
+- Blocks with well-defined **areas and shapes** (it may also need *clustering* to combine several partitions into one single partition.)
+
+- Blocks with approximated areas and no particular shapes (flexible blocks)
+
+- A **netlist** specifying connections between the blocks.
+
+Floorplanning, Placement, and Pin Assignment
+
+- Find **locations** for all blocks
+
+- Consider shapes of flexible block, pin locations of all the blocks.
+
+- Three steps in the physical design for VLSI systems 
+    - Partitioning
+    - Floorplanning
+    - Routing
+
+![Three steps](./images/image_18.png)
+
+Floor planning
+
+- Inputs to the floorplanning problem:
+    - A set of blocks, fixed or flexible
+    - Pin locations of fixed blocks
+    - A netlist
+
+- Objective: 
+    - **Minimize Area**
+    - **Reduce wirelength** for (critical) nets
+    - **Maximize routability**
+    - determine shapes of flexible blocks
+
+Some terminologies for Floorplan Design
+
+- Modules: a shape of rectangle with a width of x and a height of y.
+
+- Aread: the area of the module, i.e, xy
+
+- Aspect ratio: the allowed minimum and maximum value of height and weight ratio (r <= y/x <= s>)
+
+- Rotation: the rotated module with a width of y and a height of x
+
+- Module connectivity: the distances between the centers of modules
+
+- **Rectangular dissection**: subdivison of a given rectangle by a finite number of horizontal and vertical line segments into a finite number of non-overlapping rectangles.
+
+- **Slicing struture**: a rectangular dissection that can be obtained by repetitively subdividing rectangles horizontally or vertically.
+
+- **Slicing tree**: A binary tree, where each internal node represents a vertical cut line or horizontal cut line, and each leaf a basic rectangle.
+
+- **Skewed Slicing tree**: One in which and its **right** child are the same.
+
+![Slicing and Non-slicing floorplan, A slicing tree(skewed) and non-skewed slicing tree](./images/image_19.png)
+
+- A good structure should be a **slicing floorplan** and **skewed slicing tree**
+
+## Polish Expression Representation
+
+An expression $E = e_1e_2...e_{2n-1}$ where $e_i \in {1, 2, ..., n, H, V}$, $1 \le i \le 2n-1$, is a Polish expression of length of 2n - 1 iff:
+
+**1. every operand j**, $1 \le j \le n$, **appears exactly once in E.** 
+
+**2. The balloting property**:
+
+For every subexpression $E_i = e_1...e_i, 1 \le i \le 2n-1$, $$\text{number of operands} > \text{number of operators}$$
+
+|                   |   1   |   6   |   H   |   3   |   5   |   V   |   2   |   H   |   V   |   7   |   4   |   H   |   v   |
+|-------------------|-------|-------|-------|-------|-------|-------|-------|-------|-------|-------|-------|-------|-------|
+|number of operands |   1   |   2   |   2   |   3   |   4   |   4   |   5   |   5   |   5   |   6   |   7   |   7   |   7   |
+|number of operators|   0   |   0   |   1   |   1   |   1   |   2   |   2   |   3   |   4   |   4   |   4   |   5   |   6   |
+
+- Polish expression: acutally is a **Postorder Traversal**
+
+- Define: 
+    - *ijH*: module $i$ on bottom of $j$.
+    ```
+        H              module j
+       / \      ->    -----------
+      i   j            module i
+    ```
+    - *ijV*: module $i$ on left of $j$.
+     ```
+        V              
+       / \      ->     module i | module j
+      i   j            
+    ```
+
+- exmaple:
+
+![Postorder traversal of a tree](./images/image_19.png)
+
+- Some tips for creating skewed tree from slicing footplan:
+
+    - Slice vertically first the slice horizontally if two operators are equivalent
+
+    - For continous horizontal slicing, slicing from bottom to up.
+
+    - For continous vertical slicing, slicing from left to right.
+
+    - Once happen non-skewed tree in the represnetation, use right-branch rotation method:
+        
+        i.  the right leaf of the original lower right leaf become the original lower right node.
+
+        ii. the left leaf of the original lower right become the original lower right node's right leaf
+        
+        iii. the left leaf of original upper node becomes the left leaf of original lower right node
+        
+        iv. the original lower right node becomes left node of original upper node.
+
+        ```
+                      V                                             V
+                   /     \                                      /       \
+                  H        H                                   H         H
+                 / \     /   \                                / \      /   \
+                2   1   V     H             ->               2   1    H      3
+                       / \   / \                                    /   \
+                      6   7 V   3                                  V     V   
+                           / \                                    / \   / \
+                          4   5                                  6   7 4   5
+        ```
+
+## Normalized Polish Expression
+
+A Polish expression E = e_1e_2...e_{2n-1} is called normalized iff **E has no consecutive operators of the same type (H or V)**.
+
+Theory: Given a **normalized** Polish expression, we can construct a unique rectangular angular slicing three.
+
+- examole:
+
+![A normalized Polish Expression](./images/image_21.png)
+
+## Three types Moves of Polish Expression
+
+|Pollsion Expression|   1   |   6   |   H   |   3   |   5   |   V   |   2   |   H   |   V   |   7   |   4   |   H   |   v   |
+|-------------------|-------|-------|-------|-------|-------|-------|-------|-------|-------|-------|-------|-------|-------|
+|number of operands |   1   |   2   |   2   |   3   |   4   |   4   |   5   |   5   |   5   |   6   |   7   |   7   |   7   |
+|number of operators|   0   |   0   |   1   |   1   |   1   |   2   |   2   |   3   |   4   |   4   |   4   |   5   |   6   |
+
+- **Chain**
+    - HVHVH... or
+    - VHVHV...
+    - The third and forth chain is a *HV* two-operator chain while the first and second chain is a one-operator chain.
+
+- **Adjacent**
+    - 1 and 6 are adjacent operands
+    - 2 and 7 are adjacent operands as well
+    - 5 and V are adjacent operand and operator
+
+### M1 (Opreand Swap):
+Swap two **adjacent oprands**
+
+### M2 (Chain Invert): 
+
+Complement some **chains** ($\overline{V} = H, \overline{H} = V$).
+
+### M3 (Operator/Operand Swap): 
+
+Swap **two adjacent operand and operator**.
+
+- Pay attention to M3 movement: it may cause illegal normalzide Polish Expression.
+
+- **Gold thrumb rule**: Move operands to the left is always valid, but move operators to the left may not be valid, need M3 checks.
+
+- **Check M3 Moves:**  Assume that the M3 move swaps the operand $e_i$ with the operator $e_{i+1}$, $1 \le i \le k - 1$. Then, the swap will not violate the balloting property iff $$2N_{i+1} < i$$
+
+    - $N_k$: # of operands in the Polish expression $E = e_1e_2...e_k$, $1 \le k \le 2n - 1$
+
+    - For example (see the table): 
+
+        - swap 2 and H: the index of 2 is *7* and the index of H is *8*, the number of opreands at *index 7* is **5** and the number of operators at *index 8* is **3**, (i.e, $N_8 = 3$) and $2*N_8 < 7$, so this move is valid.
+
+        - swap 6 and H: the index of 6 is *2* and the number of operators of H is **1** (i.e, $N_3 = 1$), and $2*N_3 = 2$, so this move is invalid.
+
+## Example of construction floorplan from a given normalized Polish Expression
+
+### Initial normalized Polish Expression
+
+PE1 = 25V1H374VH6V8VH
+
+Dimensions: (2,4), (1,3), (3,3), (3,5), (3,2), (5,3), (1,2), (2,4)
+
+![Initial tree and foolplanning](./images/image_22.png)
+
+### M1 Move
+
+Swap module 3 and 7 in PE1 and get PE2 = 25V1H734VH6V8VH
+
+![From first tree to second tree](./images/image_23.png)
+
+![From first floorplan to second floorplan](./images/image_24.png)
+
+### M2 Move
+
+Complement last chain in PE2 will get PE3 = 25V1H734VH6V8HV
+
+![From second tree to third tree](./images/image_25.png)
+
+![From second floorplan to third floorplan](./images/image_26.png)
+
+### M3 Move
+
+Swaps 6 and V in PE3 will get PE4 = 25V1H734VHV68HV
+
+- In PE3, the index of 6 is *11* and the number of operator of V is **5** ($N_12 = 5$)
+
+- The swaps 6 and V are valid because $2N_12 = 10 < 11$, so swap of 6 and V is valid.
+
+![From third tree to fourth tree](./images/image_27.png)
+
+![From third floorplan to fourth floorplan](./images/image_28.png)
+
+
+## Area Computation
+
+- **abH**
+    - $A = max(\text{width of a}, \text{width of b}) \times (\text{height of a} + \text{height of b})$
+
+    ![aread abH](./images/image_29.png)
+
+- **abV**
+    - $A = (\text{width of a} + \text{width of b}) \times max(\text{height of a} + \text{height of b})$
+
+    ![area abV](./images/image_30.png)
+
+## Over wiring length Computation
+
+The overall wiring length is:
+
+$$W = \sum_{ij} c_{ij} d_{ij}$$
+
+, where $c_{ij}$ is the number of connections between blocks $i$ and $j$.
+
+$d_{ij}$ is the center-to-center distance between basic rectangles $i$ and $j$.
+
+## Cost Function
+
+The cost function is:
+
+$$\Phi = A + \lambda W$$
+
+, where $\lambda$ is the user-specified parameter.
+
