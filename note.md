@@ -556,7 +556,7 @@ For every subexpression $E_i = e_1...e_i, 1 \le i \le 2n-1$, $$\text{number of o
 
 ## Normalized Polish Expression
 
-A Polish expression E = e_1e_2...e_{2n-1} is called normalized iff **E has no consecutive operators of the same type (H or V)**.
+A Polish expression $E = e_1e_2...e_{2n-1}$ is called normalized iff **E has no consecutive operators of the same type (H or V)**.
 
 Theory: Given a **normalized** Polish expression, we can construct a unique rectangular angular slicing three.
 
