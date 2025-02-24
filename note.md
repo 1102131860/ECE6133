@@ -679,3 +679,357 @@ $$\Phi = A + \lambda W$$
 
 , where $\lambda$ is the user-specified parameter.
 
+# Sequence-Pair Based Floorplanning/Placement
+
+Represent a packing by a pair of module-name sequences (e.g., ($abdecf, cbfade$))
+
+Correspond all pairs of the sequences to a P-admissible solution space.
+
+Search in the P-admissible solution space (typically, by simulated annealing).
+
+## Relative Module Positions
+
+A floorplan is a partition of a chip into **rooms**, each containing at most one block.
+
+**Locus**(right-up, left-down, up-left, down-right)
+
+1. Take a non-empty room.
+
+2. Start at *the center of the room*, walk in two alternating directions to hit the sides of rooms.
+
+3. Continue until to reach a corner of the chip.
+
+![Loci of module b](./images/image_31.png)
+
+**Positive Locus:**
+
+- Union of **right-up** locus and **left-down** locus.
+
+![Positive Loci: abdecf](./images/image_32.png)
+
+**Negative Locus**
+
+- Union of **up-left** locus and **down-right** locus.
+
+![Negative loci: cbfade](./images/image_33.png)
+
+## Geometrical Information
+
+No pair of postive (negative) loci cross each other, i.e, loci are linearly ordered.
+
+Sequence Pair ($Γ_+, Γ_-$): 
+
+- $Γ_+$ is a module-name sequence representing the order of postive loci.
+
+- e.g., $(Γ_+, Γ_-)= (abdecf, cbfade)$
+
+$x'$ is **after** (**before**) $x$ in both $Γ_+$ and $Γ_-$ $⇒$ $x'$ is **right** (**left**) to $x$
+
+$x'$ is **after** (**before**) $x$ in $Γ_+$ and **before**(**after**) $x$ in $Γ_-$ $⇒$ $x'$ is **below** (**above**) to $x$
+
+Object to $x$, when $x'$ 
+|$Γ_+$   | $Γ_-$  | Position  |
+|--------|--------|-----------|
+|after   |  after | right     |
+|after   |  before| below     |
+|before  |  before| left      |
+|beofre  |  after | above     |
+
+## ($Γ_+$, $Γ_-$) Packing 
+
+For every sequence pair ($r_+, r_-$), there is a ($r_+, r_-$) packing.
+
+**Horizontal constraint graph** $G_H(V, E)$ (similarly for $G_V(V,E)$)
+
+- V: Source $s$, sink $t$, $m$ vertices for modules.
+
+- E: ($s, x$) and ($x, t$) for each module $x$, and ($x, x'$) iff $x$ must be **left-to** x'.
+
+    - In $G_V(V,E)$, ($x, x'$) iff $x$ must be **down-to** x'.
+
+- **Vertex weight**: 0 for $s$ and $t$, **width** of module **x** for the other vertices.
+
+    - For $G_V(V,E)$, **height** of module **x** for the other vertices.
+
+**Optimal ($Γ_+, Γ_-$) Packing** can be obtained in $O(m^2)$ time by applying a longest path algorithm on a vertex-weighted DAG.
+
+- $G_H$ and $G_V$ are independent
+
+- The $X$ and $Y$ coordinates of each module are determined as the minimun by assiging the longest path length between $s$ and the vertex of the module in $G_H$ and $G_V$, respectively.
+
+The set of all sequence pairs is a P-admissible solution space.
+
+
+## Transitive Reduction
+
+HCG/VCG are **DAG** （Directed acyclic graph）
+
+**Longest path from the source in terms of # hops**
+
+Then remove the edges not on the longest paths
+
+This can be done in **linear time**! Use **topological sorting**.
+
+## Example
+
+### Initial SP: $SP_1 = (17452638，84725361)$
+
+Dimensions: {1:(2,4), 2:(1,3), 3:(3,3), 4:(3,5), 5:(3,2), 6:(5,3), 7:(1,2), 8:(2,4)} (width, height)
+
+x = 1:
+-   |$Γ_+$   | $Γ_-$  | Position  |   x'  |
+    |--------|--------|-----------|-------|
+    |after   |  after | right     |None   |
+    |after   |  before| below     |2345678|
+    |before  |  before| left      |None   |
+    |beofre  |  after | above     |None   |
+
+x = 2:
+-   |$Γ_+$   | $Γ_-$  | Position  |   x'  |
+    |--------|--------|-----------|-------|
+    |after   |  after | right     |63     |
+    |after   |  before| below     |8      |
+    |before  |  before| left      |74     |
+    |beofre  |  after | above     |15     |
+
+x = 3:
+-   |$Γ_+$   | $Γ_-$  | Position  |   x'  |
+    |--------|--------|-----------|-------|
+    |after   |  after | right     |None   |
+    |after   |  before| below     |8      |
+    |before  |  before| left      |7452   |
+    |beofre  |  after | above     |16     |
+
+x = 4:
+-   |$Γ_+$   | $Γ_-$  | Position  |   x'  |
+    |--------|--------|-----------|-------|
+    |after   |  after | right     |5263   |
+    |after   |  before| below     |8      |
+    |before  |  before| left      |None   |
+    |beofre  |  after | above     |17     |
+
+x = 5:
+-   |$Γ_+$   | $Γ_-$  | Position  |   x'  |
+    |--------|--------|-----------|-------|
+    |after   |  after | right     |63     |
+    |after   |  before| below     |28     |
+    |before  |  before| left      |74     |
+    |beofre  |  after | above     |1      |
+
+x = 6:
+-   |$Γ_+$   | $Γ_-$  | Position  |   x'  |
+    |--------|--------|-----------|-------|
+    |after   |  after | right     |None   |
+    |after   |  before| below     |38     |
+    |before  |  before| left      |7452   |
+    |beofre  |  after | above     |1      |
+
+x = 7:
+-   |$Γ_+$   | $Γ_-$  | Position  |   x'  |
+    |--------|--------|-----------|-------|
+    |after   |  after | right     |5263   |
+    |after   |  before| below     |48     |
+    |before  |  before| left      |None   |
+    |beofre  |  after | above     |1      |
+
+x = 8:
+-   |$Γ_+$   | $Γ_-$  | Position  |   x'  |
+    |--------|--------|-----------|-------|
+    |after   |  after | right     |None   |
+    |after   |  before| below     |None   |
+    |before  |  before| left      |None   |
+    |beofre  |  after | above     |1745263|
+
+
+Based on $SP_1$ we build the following table:
+
+|module | right-of  | left-of   | above       | below       |
+|-------|-----------|-----------|-------------|-------------|
+|1      |$\emptyset$|$\emptyset$|$\emptyset$  |2,3,4,5,6,7,8|
+|2      |3,6        |   4,7     |   1,5       |   8         |
+|3      |$\emptyset$|  2,4,5,7  |   1,6       |   8         |
+|4      |2,3,5,6    |$\emptyset$|   1,7       |   8         |
+|5      |3,6        |   4,7     |   1         |   2,8       |
+|6      |$\emptyset$|   2,4,5,7 |   1         |   3,8       |
+|7      |2,3,5,6    |$\emptyset$|   1         |   4,8       |
+|8      |$\emptyset$|$\emptyset$|1,2,3,4,5,6,7|$\emptyset$  |
+
+### Constraint Graphs
+
+HCG (Horizontal constaint graph)
+- Focus on **right-of** and **left-of** two columns
+
+- 1 and 8 have no right-of and left-of so they are singluar vertices.
+
+- 3 and 6 have left-of but no right-of, so 3 and 6 must be the most right.
+
+- 4 and 7 have right-of but no left-of, so 4 and 6 must be the left most.
+
+- 2 and 5 have both right most vertices 3 and 6 and have left most 4 and 7, so they are in the middle between 4:7, and 3:6.
+
+- 4 and 7 can access 2 and 5 equally, 2 and 5 can access 3 and 6 equally as well. 
+
+- The lines between 4:7 and 3:6 are eliminated as the **transitive reduction**.
+
+Before and after removing transitive edges.
+    
+![HCG](./images/image_34.png)
+
+VCG (Vertical constraint graph)
+
+- Foucs on **above** and **below** two columns
+
+- 1 only has below and no above, so 1 is the most top vertice
+
+- 8 only has above and no below, so 8 is the most bottom vertice
+
+- 5, 6, 7 only below the most top vertice 1.
+
+- 2, 3, 4 only above the most bottom vertce 8.
+
+- 5 is above 1, 6 is above 3 and 7 is above 4.
+
+After removing transitive edges.
+
+![VCG](./images/image_35.png)
+
+### Computing Chip Width and Height
+
+In the HCG, the **node weight** is the **module width**, while in the VCG, the **node weight** is the **module height**
+
+The **chip weight** is the **longest path from s to t** for both HCG and VCG.
+
+Since we have applied topology sorting and get the removed transitive edge DAG, so the **longest path** is just to **choose the vertice whose node weight is largest in that layer**
+
+![Longest Path in HCG and VCG](./images/image_36.png)
+
+### Computing Module Location
+
+Use longest source-module path length in HCG/VCG
+
+*Lower-left corner location = source to module **input** path length*
+
+In HCG,
+
+- node 1, 7 and 8: not at the longest path, so the weight is the last node connecting to it, i.e, s, so 0.
+
+- node 4: at the longest path, follow its last node's wieght 0.
+
+- node 5: at the longest path, follow its last node's, i.e, 4, weight of 3.
+
+- node 2: not at the longest path, but last node is at the longest path, follows the last node at the longest path, i.e, 4, weight of 3.
+
+- node 6: at the longest path, follow its last node's, i.e, 5, accumulated weight of 6 (3+3).
+
+- node 3: not at the longest path, but last node is at the longest path, follows the last node at the longest path, i.e, 5, accumulated weight of 6 (3+3).
+
+
+In VCG,
+
+- node 8: at the longest path, follow its last node's wieght 0.
+
+- node 4: at the longest path, follows its last node's weight 4.
+
+- node 2 and 3: not at the longest path, but its last node at the longest path, so follows that node, i.e, 8, weight of 4.
+
+- node 7: at the longest path, follows its last node's, and accumulated weight is 9 (5+4) 
+
+- node 5 and 6: not at the longest path, and their last nodes not at the longest path neither. So they follows their **original path**, and weight is **7 (4+3)**
+
+- node 1: at the longest path, follows its last node's, and accumulated weight is 11 (5+4+2) 
+
+|module |   HCG |   VCG |
+|-------|-------|-------|
+|1      |   0   |   11  |  
+|2      |   3   |   4   |
+|3      |   6   |   4   |
+|4      |   0   |   4   |
+|5      |   3   |   7   |
+|6      |   6   |   7   |
+|7      |   0   |   9   |
+|8      |   0   |   0   |
+
+
+### The final floorplan
+
+Althogh node 3 and 6 are at the most right (x-axis = 6), the width of 6 is node 5, is larger than the width of node 3, i.e, 3. So the chip width = 6 + 5 = 11
+
+The node 1 is at the most top (y-axis = 11) and its height is 4. So the chip height = 11 + 4 = 15.
+
+Dimension is $11 \times 15$
+
+![Dimension 11 x 15](./images/image_37.png)
+
+## Move
+There are two types of movement:
+
+1. Swap two nodes at the either postive locis or negative locis.
+
+2. Swap two nodes at the both locus.
+
+### Move I
+
+Swap 1 and 3 in positive sequence of SP1
+
+- $SP_1 = (\bold{1}74526\bold{3}8, 84725361)$ 
+
+- $SP_2 = (\bold{3}74526\bold{1}8, 84725361)$ 
+
+- Node 1 and 3, swicth its below with left-of, above with right-of.
+
+- 6 is special, as it is the node between node 1 and 3 in both $(Γ_+,Γ_-)$, so the move affect it like node 1 and 3
+
+- Excpet 1, 3, and 6, other nodes only replace the original 1 with 3, original 3 with 1.
+
+|module |  right-of (aa)| left-of (bb)  |   above (ba)  |   below (ab)  |
+|-------|---------------|---------------|---------------|---------------|
+|1      |$\emptyset$    | 2,3,4,5,6,7   |$\emptyset$    |   8           |
+|2      |1, 6           | 4, 7          |   3, 5        |   8           |
+|3      |1, 6           | $\emptyset$   |$\emptyset$    | 2,4,5,7,8     |
+|4      |1,2,5,6        |$\emptyset$    | 3, 7          | 8             |
+|5      |1, 6           | 4, 7          |   3           | 2, 8          |
+|6      |1              | 2,3,4,5,7     |$\emptyset$    | 8             |
+|7      |1,2,5,6        |$\emptyset$    |   3           | 4, 8          |
+|8      |$\emptyset$    |$\emptyset$    |1,2,3,4,5,6,7  |$\emptyset$    |
+
+### Constraint Graphs
+
+![Move I constraint Graphs](./images/image_38.png)
+
+
+### Constructing Floorplan
+
+- Dimension: $13 \times 14$
+
+![Move I FloorPlan](./images/image_39.png)
+
+### Move II
+
+Swap 4 and 6 in both sequences of $SP_2$
+
+- $SP_2 = (37\bold{4}52\bold{6}18, 8\bold{4}7253\bold{6}1)$
+
+- $SP_3 = (37\bold{6}52\bold{4}18, 8\bold{6}7253\bold{4}1)$
+
+- Move II is relative easier, as only node 4 and 6 switch each other, and other nodes just change original 4 with 6, original 6 with 4.
+
+|module |  right-of (aa)| left-of (bb)  |   above (ba)  |   below (ab)  |
+|-------|---------------|---------------|---------------|---------------|
+|1      |$\emptyset$    | 2,3,4,5,6,7   |$\emptyset$    |   8           |
+|2      |1, 4           | 6, 7          |   3, 5        |   8           |
+|3      |1, 4           | $\emptyset$   |$\emptyset$    | 2,5,6,7,8     |
+|4      |1              |2,3,5,6,7      |$\emptyset$    | 8             |
+|5      |1, 4           | 6, 7          |   3           | 2, 8          |
+|6      |1,2,4,5        | $\emptyset$   |   3,7         | 8             |
+|7      |1,2,4,5        |$\emptyset$    |   3           | 6, 8          |
+|8      |$\emptyset$    |$\emptyset$    |1,2,3,4,5,6,7  |$\emptyset$    |
+
+### Constraint Graphs
+
+![Move II Constraint Graphs](./images/image_40.png)
+
+### Constructing Floorplan
+
+- Dimension $13 \times 12$
+
+![Move II Floorplan](./images/image_41.png)
