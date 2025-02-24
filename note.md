@@ -971,9 +971,9 @@ There are two types of movement:
 
 Swap 1 and 3 in positive sequence of SP1
 
-- $SP_1 = (\bold{1}74526\bold{3}8, 84725361)$ 
+- $SP_1 = (\boldsymbol{1}74526\boldsymbol{3}8, 84725361)$ 
 
-- $SP_2 = (\bold{3}74526\bold{1}8, 84725361)$ 
+- $SP_2 = (\boldsymbol{3}74526\boldsymbol{1}8, 84725361)$ 
 
 - Node 1 and 3, swicth its below with left-of, above with right-of.
 
@@ -1007,9 +1007,9 @@ Swap 1 and 3 in positive sequence of SP1
 
 Swap 4 and 6 in both sequences of $SP_2$
 
-- $SP_2 = (37\bold{4}52\bold{6}18, 8\bold{4}7253\bold{6}1)$
+- $SP_2 = (37\boldsymbol{4}52\boldsymbol{6}18, 8\boldsymbol{4}7253\boldsymbol{6}1)$
 
-- $SP_3 = (37\bold{6}52\bold{4}18, 8\bold{6}7253\bold{4}1)$
+- $SP_3 = (37\boldsymbol{6}52\boldsymbol{4}18, 8\boldsymbol{6}7253\boldsymbol{4}1)$
 
 - Move II is relative easier, as only node 4 and 6 switch each other, and other nodes just change original 4 with 6, original 6 with 4.
 
