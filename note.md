@@ -737,7 +737,7 @@ Object to $x$, when $x'$
 
 ## ($Γ_+$, $Γ_-$) Packing 
 
-For every sequence pair ($r_+, r_-$), there is a ($r_+, r_-$) packing.
+For every sequence pair ($Γ_+, Γ_-$), there is a ($Γ_+, Γ_-$) packing.
 
 **Horizontal constraint graph** $G_H(V, E)$ (similarly for $G_V(V,E)$)
 
