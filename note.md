@@ -1007,9 +1007,9 @@ Swap 1 and 3 in positive sequence of SP1
 
 Swap 4 and 6 in both sequences of $SP_2$
 
-- $SP_2 = (37\mathbf{4}52\mathbf{6}18, 8\mathbf{4}7253\mathbf{6}1)$
+- $SP_2 = (37\boldsymbol{4}52\boldsymbol{6}18, 8\boldsymbol{4}7253\boldsymbol{6}1)$
 
-- $SP_3 = (37\mathbf{6}52\mathbf{4}18, 8\mathbf{6}7253\mathbf{4}1)$
+- $SP_3 = (37\boldsymbol{6}52\boldsymbol{4}18, 8\boldsymbol{6}7253\boldsymbol{4}1)$
 
 - Move II is relative easier, as only node 4 and 6 switch each other, and other nodes just change original 4 with 6, original 6 with 4.
 
