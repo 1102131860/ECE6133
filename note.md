@@ -1033,3 +1033,108 @@ Swap 4 and 6 in both sequences of $SP_2$
 - Dimension $13 \times 12$
 
 ![Move II Floorplan](./images/image_41.png)
+
+# Min-cut based method for Placement
+
+## Placement Samples
+
+"Standard" cell placement style: all cells have the same height.
+
+![Standard cell placement](./images/image_42.png)
+
+## Placement Objectives:
+
+### Total wirelength
+
+- reducing the total wirelength minimizes power consumption 
+
+- Use **Manhattan distance** to estimate the distance between connected components in the netlist
+
+    - Shorter wirelength leads to lower **RC delay**
+
+    - Reduces routing complexity
+
+    - Helps in achieving better timing closure.
+ 
+### Number of Cut Nets
+
+- Fewer cut nets improve partioning efficiency and reduce interconnect overhead. 
+
+- A "cut net" is a net that spans multiple partition in a **hierarchical** or **partition-based** placement
+
+    - Directly **impacts routing congestion**
+
+    - Reduces interconnect overhead and cross-boundary delays
+
+### Wire Congestion
+
+- Congestion leads to **difficulties in rounting**, **longer routing delays**, and **possible design rule violations** 
+
+- Congestion measures the density of routing demand in a given region compared to available routing resources
+
+    - Affect **timing closure**
+
+    - Help avoid **design rule violations (DRC)**
+
+    - Ensures feasible routing without requiring **detours or layer switching**
+
+### Signal Delay
+
+- Critial for meeting **setup** and **hold time** constraints.
+
+- Placement affects the **RC delay** of interconnects, which influences the **signal propagation delay**
+
+    - Affects **clock period and frequency**
+
+    - Placement should favor **timing-critical paths** and optimize **setup slack**
+
+    - **Buffer insertion** and **cell resizing** may be required post-placement to management delays
+
+## Wirelength Estimation
+
+Perferred method: $\underline{\text{Half-perimeter wirelength (HPWL)}}$
+
+i.e. similar to **Manhattan distance**, $d = |x_1 - x_2| + |y_1 - y_2|$
+
+- Fast (order of magnitude faster than RSMT)
+
+- Equal to length of RSMT for 2- and 3-pi nets
+
+- Margin of error for real circuits approximate 8%
+
+![Half-perimeter wirelength](./images/image_43.png)
+
+## Min-cut Placement
+
+### Quadrature: suitable for circuits with high density in the center
+
+Divide order:
+
+- horizontal line 1
+
+- vertical line 2
+
+- horizontal line 3a and 3b
+
+- vertical line 4a and 4b
+
+![Quadrature](./images/image_44.png)
+
+### Bisection: good for standard-cell placement
+
+Bisection order:
+
+- horizontal lines: 1, 2a, 2b, 3a, 3b, 3c, 3d ($2^n$)
+
+- vertical lines: 4, 5a, 5b, 6a, 6b, 6c, 6d ($2^n$)
+
+![Bisection](./images/image_45.png)
+
+### Slice/Bisection: good for cells with high intersection on the periphery.
+
+- horizontal lines: 1, 2, 3, 4, 5, 6, 7
+
+- vertical lines (Bisection line):  8, 9a, 9b, 10a, 10b, 10c and 10d 
+
+![Slice/bisection](./images/image_46.png)
+
