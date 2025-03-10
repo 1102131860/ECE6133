@@ -1,12 +1,14 @@
 import argparse
 import numpy as np
+import random
+from collections import deque
 
 class KL_Algorithm:
     # Constant Global Configuration Variables
     PARTITION_NUMBER = 2
     PARAMETERS_NUMBER = 3
 
-    def __init__(self, file_path):
+    def __init__(self, file_path=""):
         self.file_path = file_path
 
         # graph attributes
@@ -76,6 +78,26 @@ class KL_Algorithm:
             print(f"Error reading file: {e}")
 
 
+    def sub_initialize(self, vertices, graph):
+        # record the vertices
+        self.vertices = vertices
+
+        # initialize the graph
+        for vertice in self.vertices:
+            if vertice in graph.items():
+                self.graph[vertice] = graph[vertice]
+        
+        # random select initial partitions
+        vers = list(vertices)
+        random.shuffle(vers)
+        split_index = int(len(vers) / KL_Algorithm.PARTITION_NUMBER)
+        set1, set2 = set(vers[:split_index]), set(vers[split_index:])
+        self.partitions.append((set1, set2))
+
+        # record the initial cutsizes
+        self.cutsizes.append(self.cutsize(set1, set2))
+
+
     def partitionize(self):
         # initialized unlocked vertices and partitions
         unlocked_vertices = self.vertices.copy()
@@ -112,6 +134,46 @@ class KL_Algorithm:
             self.max_gains.append(max_gain)
             self.partitions.append((p1.copy(), p2.copy()))
             self.cutsizes.append(self.cutsize(p1, p2))
+    
+
+    def result(self):
+        np_cutsizes = np.array(self.cutsizes)
+        min_cutsize = np.min(np_cutsizes)
+        min_cutsize_indices = np.where(np_cutsizes == min_cutsize)[0]
+        min_cutsize_index = min_cutsize_indices[0]
+        return self.cutsize[min_cutsize_index], self.partitions[min_cutsize_index]
+
+
+def mincut_placement(file_path, cut_num = 1):
+    partitions = []
+    cutsizes = []
+    cut_count = 0
+
+    # initialize FIFO
+    KL = KL_Algorithm(file_path)
+    KL.initialize()
+    KL_de = deque([KL])
+
+    while cut_count < cut_num:
+        for i in range(int(np.log2(cut_count + 1)) + 1):
+            # FIFO and partionize
+            kl = KL_de.popleft()
+            kl.partitionize()
+
+            # record minimum cutsize and corresponding partition
+            min_cutsize, best_partition = kl.result()
+            cutsizes.append(min_cutsize)
+            partitions.append(best_partition)
+            
+            # add the new sub partitions
+            vertices_1, vertices_2 = best_partition
+            kl_1, kl_2 = KL_Algorithm(), KL_Algorithm()
+            kl_1.sub_initialize(vertices_1, kl.graph)
+            kl_2.sub_initialize(vertices_2, kl.graph)
+            KL_de.append(kl_1)
+            KL_de.append(kl_2)
+
+        cut_count += 1
 
 
 if __name__ == "__main__":
@@ -136,3 +198,5 @@ if __name__ == "__main__":
         print(f"Iteration {i}. partitions: {KL.partitions[i]}, cutsizes: {KL.cutsizes[i]}")
     for i in range(len(KL.max_gains)):
         print(f"swap pairs {i+1}: {KL.max_swaps[i]}, gain: {KL.max_gains[i]}")
+
+    
