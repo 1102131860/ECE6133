@@ -1273,9 +1273,9 @@ Investigate other algorithms for terminal propagation
 
 - **Terminal propagation is the bottleneck of CPU time**
 
-## Gordian Placement (An analysis way)
+# Gordian Placement (An analysis way)
 
-### Quadratice Programming (QP)
+## Quadratice Programming (QP)
 
 Definition:
 
@@ -1300,7 +1300,7 @@ $$\mathbf{A}: m \times n \text{ real matrix}$$
 
 $$\mathbf{b}: m \times 1 \text{ real vector}$$
 
-### Types of QP
+## Types of QP
 
 Depends on Q
 
@@ -1322,7 +1322,7 @@ Depends on Q
 
     - NP hard
 
-### Overview of Gordian Package
+## Overview of Gordian Package
 
 ```
 l := 1;
@@ -1338,7 +1338,7 @@ final-placement(l);
 endprocedure
 ```
 
-### Problem Definition
+## Problem Definition
 
 ![General Mapping](./images/image_62.png)
 
@@ -1366,7 +1366,7 @@ $$x_{uv} = x_{u} + a_{vu}$$
 
 $$y_{uv} = y_{u} + b_{vu}$$
 
-### Cost Function
+## Cost Function
 
 Minimize the following:
 
@@ -1376,7 +1376,7 @@ $$\phi(x, y) = X^TCX + d_x^TX + Y^TCY + d_y^TY$$
 
 $$\phi(x) = X^TCX + d^TX$$
 
-### Constraints
+## Constraints
 
 The center of gravity constraints
 
@@ -1400,7 +1400,7 @@ $$A^lX = u^l$$
 
 , where $$a_{pm} = \frac{F_m}{\sum_{m ∈ M_p} F_m} \text{ if } m ∈ M_p \text{ otherwise } 0$$
 
-### Problem Fomulation Example
+## Problem Fomulation Example
 
 ![Problem Fomulation Example](./images/image_63.png)
 
@@ -1432,7 +1432,7 @@ $$\text{min}_{x ∈ R^m}{\Phi(x) = X^TCX + d^TX}$$
 
 $$A^lX = u^l$$
 
-### Partitioning
+## Partitioning
 
 Recursive partitioning is needed
 
@@ -1440,24 +1440,24 @@ Recursive partitioning is needed
 
 - global placement problem will be solved again with two additional center of gravity constraints
 
-**module update (split)**
+### module update (split)
 $$M_p → (M_{p'}, M_{p''})$$
 
-**module balance**
+### module balance
 
 $$x_{u'} \le x_{u''}, u' ∈ M_{p'} \text{ and } u'' ∈ M_{p''}$$
 
-**Cut ratio**
+### Cut ratio
 
 $$\alpha = \frac{\sum_{u' ∈ M_{p'}} F_u}{\sum_{u ∈ M_{p}} F_u} ≈ 0.5$$
 
-**Cut value**
+### Cut value
 
 $$C_p(\alpha) = \sum_{v ∈ N_c} W_v$$
 
 ![Cut value against cut ratio](./images/image_64.png)
 
-### Repartitioning
+## Repartitioning
 
 Module exchange after each cut to improve cut size
 
@@ -1478,7 +1478,7 @@ Procedure repartition(l)
     endif
 ```
 
-### Summary of Gordian
+## Summary of Gordian
 
 - Global Optimization
 
@@ -1502,19 +1502,19 @@ Procedure repartition(l)
 
 ![Summary of Gordian](./images/image_65.png)
 
-**Complexity**
+### Complexity
 
 - Space = $O(m)$
 
 - time = $O(m^{1.5} log_2m)$
 
-**Final Placement**
+### Final Placement
 
 - standard cell
 
 - macro-cell & SOG
 
-### Gordian Placement Example
+## Gordian Placement Example
 
 KL uses: 
 
@@ -1526,7 +1526,7 @@ Uniform area and net weight, area balance factor, $\frac{1}{k - 1}$
 
 ![Weights and edges](./images/image_66.png)
 
-**IO Placement**
+### IO Placement
 
 **Fistly, IO Placement of chip is necessary for GORDIAN to work**
 
@@ -1536,7 +1536,7 @@ Uniform area and net weight, area balance factor, $\frac{1}{k - 1}$
 
 ![IO Placement](./images/image_67.png)
 
-**Adjacent Matrix (A)**
+### Adjacent Matrix (A)
 
 **Connections among movable nodes**
 
@@ -1544,7 +1544,7 @@ Uniform area and net weight, area balance factor, $\frac{1}{k - 1}$
 
 ![Adjacency Matrix](./images/image_68.png)
 
-**Pin Connection Matrix (P)**
+### Pin Connection Matrix (P)
 
 **Connections between movable nodes and IO**
 
@@ -1554,13 +1554,13 @@ Uniform area and net weight, area balance factor, $\frac{1}{k - 1}$
 
 ![Pin connection Matrix](./images/image_69.png)
 
-**Degree Matrix (D)**
+### Degree Matrix (D)
 
 **Sum of entries based on adjacency and pin connection matrices (node degree)**
 
 ![Degree Matrix](./images/image_70.png)
 
-**Laplace Matrix (C)**
+### Laplace Matrix (C)
 
 **D - A (Degree Matrix minus Adjacent Matrix)**
 
@@ -1568,7 +1568,7 @@ Uniform area and net weight, area balance factor, $\frac{1}{k - 1}$
 
 **The Laplacian Matrix is just the Matrix C**
 
-**Fixed Pin Vectors**
+### Fixed Pin Vectors
 
 Based on pin connection matrix and IO location
 
@@ -1596,7 +1596,7 @@ $$d_{y}^{T} = (-2, -\frac{13}{6}, -\frac{25}{6}, -\frac{25}{6}, -\frac{4}{3}, 0,
 
 ![Fixed Pin Vectors Y](./images/image_73.png)
 
-**Level 0 QP Formulation**
+### Level 0 QP Formulation
 
 **No constraint** necessary (since $l = 0$)
 
@@ -1615,7 +1615,7 @@ $$y^T = \text{(1.27 1.83 2.48 2.61 1.16 1.45 1.84 0.92 1.41 2.03)}$$
 
 ![Level 0 Placement](./images/image_74.png)
 
-**Level 1 Partitioning**
+### Level 1 Partitioning
 
 Perform level 1 partitioning
 
@@ -1641,7 +1641,7 @@ The matrix $A^{(1)}$ for the center-of-gravity constraint at level $l = 1$:
 
 ![Constraint Matrix A at level 1](./images/image_76.png)
 
-**Level 1 LQP Formulation**
+### Level 1 LQP Formulation
 
 Solve the following Linearly constrained QP (LQP) to obtain the new placement for the movable nodes:
 
@@ -1660,7 +1660,7 @@ $$y^T = \text{(1.34 1.94 2.66 2.76 1.30 1.83 2.45 1.32 1.91 2.49)}$$
 
 ![Level 1 Placement](./images/image_77.png)
 
-**Verification**
+### Verification
 
 Verify that the constraints are satified in the left partition
 
@@ -1670,7 +1670,7 @@ $$\frac{0.70 + 0.71 + 1.17 + 1.21 + 1.22}{5} = 1.00$$
 
 $$\frac{1.34 + 1.94 + 2.66 + 2.76 + 1.30}{5} = 2.00$$
 
-**Level 2 Partitioning**
+### Level 2 Partitioning
 
 Add two more cut-lines
 
@@ -1691,7 +1691,7 @@ Thus
 
 ![Constraint Matrix A at level 2](./images/image_79.png)
 
-**Level 2 LQP Formulation**
+### Level 2 LQP Formulation
 
 Solve the following Linearly constrained QP (LQP) to obtain the new placement for the movable nodes:
 
