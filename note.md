@@ -1674,7 +1674,7 @@ $$\frac{1.34 + 1.94 + 2.66 + 2.76 + 1.30}{5} = 2.00$$
 
 Add two more cut-lines
 
-- This results in $p1 = \{c, d\}, p2 = \{a, b, e\}, p3 = \{g, j\} and p4 = \{f, h, i\}$
+- This results in $p1 = \{c, d\}, p2 = \{a, b, e\}, p3 = \{g, j\} \text{ and } p4 = \{f, h, i\}$
 
 - Note: **chip height is still 4 and we split 4 cells into 2:3 ratio**
 
