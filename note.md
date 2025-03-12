@@ -1092,7 +1092,7 @@ Swap 4 and 6 in both sequences of $SP_2$
 
 ## Wirelength Estimation
 
-Perferred method: $\underline{\text{Half-perimeter wirelength (HPWL)}}$
+Perferred method: <u>Half-perimeter wirelength (HPWL)</u>
 
 i.e. similar to **Manhattan distance**, $d = |x_1 - x_2| + |y_1 - y_2|$
 
@@ -1502,13 +1502,13 @@ Procedure repartition(l)
 
 ![Summary of Gordian](./images/image_65.png)
 
-$\underline{\text{Complexity}}$
+**Complexity**
 
 - Space = $O(m)$
 
 - time = $O(m^{1.5} log_2m)$
 
-$\underline{\text{Final Placement}}$
+**Final Placement**
 
 - standard cell
 
@@ -1526,7 +1526,7 @@ Uniform area and net weight, area balance factor, $\frac{1}{k - 1}$
 
 ![Weights and edges](./images/image_66.png)
 
-$\underline{\text{IO Placement}}$
+**IO Placement**
 
 **Fistly, IO Placement of chip is necessary for GORDIAN to work**
 
@@ -1536,7 +1536,7 @@ $\underline{\text{IO Placement}}$
 
 ![IO Placement](./images/image_67.png)
 
-$\underline{\text{Adjacent Matrix (A)}}$
+**Adjacent Matrix (A)**
 
 **Connections among movable nodes**
 
@@ -1544,7 +1544,7 @@ $\underline{\text{Adjacent Matrix (A)}}$
 
 ![Adjacency Matrix](./images/image_68.png)
 
-$\underline{\text{Pin Connection Matrix (P)}}$
+**Pin Connection Matrix (P)**
 
 **Connections between movable nodes and IO**
 
@@ -1554,13 +1554,13 @@ $\underline{\text{Pin Connection Matrix (P)}}$
 
 ![Pin connection Matrix](./images/image_69.png)
 
-$\underline{\text{Degree Matrix (D)}}$
+**Degree Matrix (D)**
 
 **Sum of entries based on adjacency and pin connection matrices (node degree)**
 
 ![Degree Matrix](./images/image_70.png)
 
-$\underline{\text{Laplace Matrix (C)}}$
+**Laplace Matrix (C)**
 
 **D - A (Degree Matrix minus Adjacent Matrix)**
 
@@ -1568,7 +1568,7 @@ $\underline{\text{Laplace Matrix (C)}}$
 
 **The Laplacian Matrix is just the Matrix C**
 
-$\underline{\text{Fixed Pin Vectors}}$
+**Fixed Pin Vectors**
 
 Based on pin connection matrix and IO location
 
@@ -1596,7 +1596,7 @@ $$d_{y}^{T} = (-2, -\frac{13}{6}, -\frac{25}{6}, -\frac{25}{6}, -\frac{4}{3}, 0,
 
 ![Fixed Pin Vectors Y](./images/image_73.png)
 
-$\underline{\text{Level 0 QP Formulation}}$
+**Level 0 QP Formulation**
 
 **No constraint** necessary (since $l = 0$)
 
@@ -1615,7 +1615,7 @@ $$y^T = \text{(1.27 1.83 2.48 2.61 1.16 1.45 1.84 0.92 1.41 2.03)}$$
 
 ![Level 0 Placement](./images/image_74.png)
 
-$\underline{\text{Level 1 Partitioning}}$
+**Level 1 Partitioning**
 
 Perform level 1 partitioning
 
@@ -1641,7 +1641,7 @@ The matrix $A^{(1)}$ for the center-of-gravity constraint at level $l = 1$:
 
 ![Constraint Matrix A at level 1](./images/image_76.png)
 
-$\underline{\text{Level 1 LQP Formulation}}$
+**Level 1 LQP Formulation**
 
 Solve the following Linearly constrained QP (LQP) to obtain the new placement for the movable nodes:
 
@@ -1660,7 +1660,7 @@ $$y^T = \text{(1.34 1.94 2.66 2.76 1.30 1.83 2.45 1.32 1.91 2.49)}$$
 
 ![Level 1 Placement](./images/image_77.png)
 
-$\underline{\text{Verification}}$
+**Verification**
 
 Verify that the constraints are satified in the left partition
 
@@ -1670,7 +1670,7 @@ $$\frac{0.70 + 0.71 + 1.17 + 1.21 + 1.22}{5} = 1.00$$
 
 $$\frac{1.34 + 1.94 + 2.66 + 2.76 + 1.30}{5} = 2.00$$
 
-$\underline{\text{Level 2 Partitioning}}$
+**Level 2 Partitioning**
 
 Add two more cut-lines
 
@@ -1691,7 +1691,7 @@ Thus
 
 ![Constraint Matrix A at level 2](./images/image_79.png)
 
-$\underline{\text{Level 2 LQP Formulation}}$
+**Level 2 LQP Formulation**
 
 Solve the following Linearly constrained QP (LQP) to obtain the new placement for the movable nodes:
 
