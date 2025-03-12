@@ -1299,3 +1299,425 @@ $$\mathbf{c}: n \times 1 \text{ vector}$$
 $$\mathbf{A}: m \times n \text{ real matrix}$$
 
 $$\mathbf{b}: m \times 1 \text{ real vector}$$
+
+### Types of QP
+
+Depends on Q
+
+- Positive Definite Hessian Matrix (Bowl)
+
+    - All its eigenvalues are positive
+
+    - One optimal value: Convex
+
+- Semi-definite Hessian Matrix (Trough)
+
+    - All its eigenvalues are non-negative
+
+    - Line of optimal values: Convex
+
+- Indefinite Hessian Matrix (Saddle)
+
+    - Optimal is on the boundaries: Non-convex
+
+    - NP hard
+
+### Overview of Gordian Package
+
+```
+l := 1;
+global-optimize(l);
+while (there exists |Ml| > k)
+    for each r in R(l)
+        partition(r, r', r'');
+    l++;
+    setup-constraints(l);
+    gloabl-optimize(l);
+    repartition(l);
+final-placement(l);
+endprocedure
+```
+
+### Problem Definition
+
+![General Mapping](./images/image_62.png)
+
+**module center** $u$
+
+- ($x_u$, $y_u$)
+
+**Pin** $uv$
+
+- ($x_{uv}$, $y_{uv}$)
+
+**Net node** $v$
+
+- ($x_v$, $x_v$)
+
+**Squared wire length of net** $v$ (the length from **Net** $v$ **to Pin** $uv$)
+
+$$L_v = \sum_{u ∈ M_v} [(x_{uv} - x_v)^2 + (y_{uv} - y_v)^2]$$
+
+**Offset between module center** $u$ and **Pin** $v$
+
+- ($a_{vu}$, $b_{vu}$)
+
+$$x_{uv} = x_{u} + a_{vu}$$
+
+$$y_{uv} = y_{u} + b_{vu}$$
+
+### Cost Function
+
+Minimize the following:
+
+$$\phi = \frac{1}{2}\sum_{v ∈ N} L_v W_v$$
+
+$$\phi(x, y) = X^TCX + d_x^TX + Y^TCY + d_y^TY$$
+
+$$\phi(x) = X^TCX + d^TX$$
+
+### Constraints
+
+The center of gravity constraints
+
+- At level $l$, chip is divied into $q(\le 2^l)$ regions
+
+- For region $p$, the center coordinates: ($u_p$, $v_p$)
+
+- $M_p$: set of modules in region $p$
+
+- Martix from for all regions
+
+$$\sum_{m ∈ M_p} F_m x_m = u_p \times \sum_{m ∈ M_p} F_m$$
+
+, where $u_p = \frac{\sum_{m ∈ M_p} F_m x_m}{\sum_{m ∈ M_p} F_m}$ 
+
+$F_m$ is the module area
+
+- Lastly
+
+$$A^lX = u^l$$
+
+, where $$a_{pm} = \frac{F_m}{\sum_{m ∈ M_p} F_m} \text{ if } m ∈ M_p \text{ otherwise } 0$$
+
+### Problem Fomulation Example
+
+![Problem Fomulation Example](./images/image_63.png)
+
+$A^l \text{ is the constraint matrix at iteration } l$
+
+In the ($u_p$, $v_p$) center of region, there are modules A, B and C in its room, so * means the non-zero value, and other modules are all zero.
+
+Specially,
+
+$$A_{pm} = \frac{F_M^A}{F_M^A + F_M^B + F_M^C}$$
+
+
+$$B_{pm} = \frac{F_M^B}{F_M^A + F_M^B + F_M^C}$$
+
+
+$$C_{pm} = \frac{F_M^C}{F_M^A + F_M^B + F_M^C}$$
+
+otherwise, all are zero
+
+If there are $m$ regions at iteration $l$ and $n$ modules, the matrix $A^l$ will $m \times n$
+
+**Linearly constrained Quadratic Programming problem**
+
+**LQP:**
+
+$$\text{min}_{x ∈ R^m}{\Phi(x) = X^TCX + d^TX}$$
+
+**so that**
+
+$$A^lX = u^l$$
+
+### Partitioning
+
+Recursive partitioning is needed
+
+- to resolve module overlap in global placement
+
+- global placement problem will be solved again with two additional center of gravity constraints
+
+**module update (split)**
+$$M_p → (M_{p'}, M_{p''})$$
+
+**module balance**
+
+$$x_{u'} \le x_{u''}, u' ∈ M_{p'} \text{ and } u'' ∈ M_{p''}$$
+
+**Cut ratio**
+
+$$\alpha = \frac{\sum_{u' ∈ M_{p'}} F_u}{\sum_{u ∈ M_{p}} F_u} ≈ 0.5$$
+
+**Cut value**
+
+$$C_p(\alpha) = \sum_{v ∈ N_c} W_v$$
+
+![Cut value against cut ratio](./images/image_64.png)
+
+### Repartitioning
+
+Module exchange after each cut to improve cut size
+
+- Terminal propagation using global placement positions
+
+Reparitioning
+
+- to 'undo' the mistake made at the previous level
+
+```
+Procedure repartition(l)
+    if overlap exits
+        for each r in R(l-1)
+            merge-regions(r, r', r'');
+            parition(r, r', r'');
+        setup-constraints(l);
+        global-optimize(l);
+    endif
+```
+
+### Summary of Gordian
+
+- Global Optimization
+
+    - Minimize wire length
+
+    - Module coordinates
+
+    - Position constraints
+
+- Partitioning
+
+    - Module set and dissection of placement region
+
+    - Regions $\le k$ modules 
+
+    - Module constraints
+
+- Final Placement
+
+    - Adoption of style dependent and constraints
+
+![Summary of Gordian](./images/image_65.png)
+
+$\underline{\text{Complexity}}$
+
+- Space = $O(m)$
+
+- time = $O(m^{1.5} log_2m)$
+
+$\underline{\text{Final Placement}}$
+
+- standard cell
+
+- macro-cell & SOG
+
+### Gordian Placement Example
+
+KL uses: 
+
+Uniform area and net weight, area balance factor, $\frac{1}{k - 1}$
+
+**But Gordian uses**:
+
+**Undirected graph model**: each edge in **k-clique gets weight** $\frac{2}{k}$
+
+![Weights and edges](./images/image_66.png)
+
+$\underline{\text{IO Placement}}$
+
+**Fistly, IO Placement of chip is necessary for GORDIAN to work**
+
+- w1(0,1), w2(0,2), w3(0,3), w4(1,4)
+
+- z1(2,0), z2(3,0), z3(4,1), z4(4,2)
+
+![IO Placement](./images/image_67.png)
+
+$\underline{\text{Adjacent Matrix (A)}}$
+
+**Connections among movable nodes**
+
+- Among nodes $a$ to $j$
+
+![Adjacency Matrix](./images/image_68.png)
+
+$\underline{\text{Pin Connection Matrix (P)}}$
+
+**Connections between movable nodes and IO**
+
+- Rows = movable nodes
+
+- Columns = IO (fixed)
+
+![Pin connection Matrix](./images/image_69.png)
+
+$\underline{\text{Degree Matrix (D)}}$
+
+**Sum of entries based on adjacency and pin connection matrices (node degree)**
+
+![Degree Matrix](./images/image_70.png)
+
+$\underline{\text{Laplace Matrix (C)}}$
+
+**D - A (Degree Matrix minus Adjacent Matrix)**
+
+![Laplacian Matrix](./images/image_71.png)
+
+**The Laplacian Matrix is just the Matrix C**
+
+$\underline{\text{Fixed Pin Vectors}}$
+
+Based on pin connection matrix and IO location
+
+Each entry $i$ in $d_x$, denoted $d_{x,i}$ is computed as follows:
+
+$$d_{x,i} = - \sum_{j}p_{ij} \times x(p_{j})$$
+
+$$d_{y,i} = - \sum_{j}p_{ij} \times y(p_{j})$$
+
+where $p_{ij}$ denotes the entry of **the pin connection matrix**, and $x(pj)$ is the **x-coordinate of the correponding IO pin** $j$, Y-direction is defined similarly.
+
+$$d_{x,1} = - (\frac{2}{3} \times 0 + \frac{2}{3} \times 0 + 0 \times 0 + 0 \times 1 + \frac{1}{2} \times 2 + 0 \times 3 + 0 \times 4 + 0 \times 4) = -1$$
+
+By examining the reamining 9 movable cells, we get
+
+$$d_{x}^{T} = (-1, 0, -\frac{2}{3}, -\frac{2}{3}, -1, -1, 0, -3, -4, -4)$$
+
+![Fixed Pin Vectors X](./images/image_72.png)
+
+$$d_{y,1} = - (\frac{2}{3} \times 1 + \frac{2}{3} \times 2 + 0 \times 3 + 0 \times 4 + \frac{1}{2} \times 0 + 0 \times 0 + 0 \times 1 + 0 \times 2) = -2$$
+
+By examining the reamining 9 movable cells, we get
+
+$$d_{y}^{T} = (-2, -\frac{13}{6}, -\frac{25}{6}, -\frac{25}{6}, -\frac{4}{3}, 0, 0, 0, -1, -2)$$
+
+![Fixed Pin Vectors Y](./images/image_73.png)
+
+$\underline{\text{Level 0 QP Formulation}}$
+
+**No constraint** necessary (since $l = 0$)
+
+Minimize 
+
+$$\phi(x) = \frac{1}{2}x^TCx + d_x^Tx$$
+
+and
+$$\phi(y) = \frac{1}{2}y^TCy + d_y^Ty$$
+
+We use MOSEK and obtain the following solution:
+
+$$x^T = \text{(0.95 0.92 1.21 1.32. 1.32 1.61 1.98 2.13 2.59 2.51)}$$
+
+$$y^T = \text{(1.27 1.83 2.48 2.61 1.16 1.45 1.84 0.92 1.41 2.03)}$$
+
+![Level 0 Placement](./images/image_74.png)
+
+$\underline{\text{Level 1 Partitioning}}$
+
+Perform level 1 partitioning
+
+- Obatin center locations for center-of-gravity constraints
+
+![Level 1's Center-of-gravity constraints](./images/image_75.png)
+
+Sort the nodes based on their x - coordinates:
+
+$$\text{\{b, a, c, e, d, f, g, h, j, i\}}$$
+
+Paritioning under $\alpha = 0.5$:
+
+$$S_{p'} = \text{\{b, a, c, e, d\}}, S_{p''} = \text{\{f, g, h, j, i\}}$$
+
+The center location vectors are:
+
+$$
+u_x^{(1)} = \begin{pmatrix} 1 \\ 3 \end{pmatrix}, u_y^{(1)} = \begin{pmatrix} 2 \\ 2 \end{pmatrix}
+$$
+
+The matrix $A^{(1)}$ for the center-of-gravity constraint at level $l = 1$:
+
+![Constraint Matrix A at level 1](./images/image_76.png)
+
+$\underline{\text{Level 1 LQP Formulation}}$
+
+Solve the following Linearly constrained QP (LQP) to obtain the new placement for the movable nodes:
+
+Minimize
+
+$$\phi(x) = \frac{1}{2}x^TCx + d_x^Tx, \text{ subject to } A^{(1)} x = u_x^{(1)}$$
+
+
+$$\phi(y) = \frac{1}{2}y^TCy + d_y^Ty, \text{ subject to } A^{(1)} y = u_y^{(1)}$$
+
+The solutions are as follows:
+
+$$x^T = \text{(0.70 0.71 1.17 1.21 1.22 2.17 3.10 2.84 3.56 3.33)}$$
+
+$$y^T = \text{(1.34 1.94 2.66 2.76 1.30 1.83 2.45 1.32 1.91 2.49)}$$
+
+![Level 1 Placement](./images/image_77.png)
+
+$\underline{\text{Verification}}$
+
+Verify that the constraints are satified in the left partition
+
+- a(0.70, 1.34), b(0.71, 1.94), c(1.17, 2.66), d(1.21, 2.76) and e(1.22, 1.30)
+
+$$\frac{0.70 + 0.71 + 1.17 + 1.21 + 1.22}{5} = 1.00$$
+
+$$\frac{1.34 + 1.94 + 2.66 + 2.76 + 1.30}{5} = 2.00$$
+
+$\underline{\text{Level 2 Partitioning}}$
+
+Add two more cut-lines
+
+- This results in $p1 = \{c, d\}, p2 = \{a, b, e\}, p3 = \{g, j\} and p4 = \{f, h, i\}$
+
+- Note: **chip height is still 4 and we split 4 cells into 2:3 ratio**
+
+![Level 2 Partitioning](./images/image_78.png)
+
+The center location vectors are:
+
+$$
+u_x^{(2)} = \begin{pmatrix} 1 \\ 1 \\ 3 \\ 3 \end{pmatrix}, \quad
+u_y^{(2)} = \begin{pmatrix} 3.2 \\ 1.2 \\ 3.2 \\ 1.2 \end{pmatrix}
+$$
+
+Thus
+
+![Constraint Matrix A at level 2](./images/image_79.png)
+
+$\underline{\text{Level 2 LQP Formulation}}$
+
+Solve the following Linearly constrained QP (LQP) to obtain the new placement for the movable nodes:
+
+Minimize
+
+$$\phi(x) = \frac{1}{2}x^TCx + d_x^Tx, \text{ subject to } A^{(2)} x = u_x^{(2)}$$
+
+
+$$\phi(y) = \frac{1}{2}y^TCy + d_y^Ty, \text{ subject to } A^{(2)} y = u_y^{(2)}$$
+
+
+The solutions are as follows:
+
+$$x^T = \text{(0.83 0.78 1.00 1.00 1.39 2.28 2.89 3.06 3.66 3.11)}$$
+
+$$y^T = \text{(1.01 1.78 3.08 3.32 0.82 1.44 3.18 0.59 1.57 3.22)}$$
+
+![Level 2 Placement](./images/image_80.png)
+
+### Summary of Gordian Example
+
+**Center-of-gravity constraint**
+
+- Helps spread the cells evenly while monitoring wirelength
+
+- Removes overlaps among the cells (with real dimension)
+
+![QP and Partitioning](./images/image_81.png)
+
