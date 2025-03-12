@@ -1092,7 +1092,7 @@ Swap 4 and 6 in both sequences of $SP_2$
 
 ## Wirelength Estimation
 
-Perferred method: <u>Half-perimeter wirelength (HPWL)</u>
+Perferred method: *Half-perimeter wirelength (HPWL)*
 
 i.e. similar to **Manhattan distance**, $d = |x_1 - x_2| + |y_1 - y_2|$
 
@@ -1156,11 +1156,11 @@ We should use the fact that $s$ in $L_1$!
 
 When not to use $p$ to bias partionting? Net $s$ has cells in many groups?
 
-- $\underline{\text{Don't use}}$ $p$ to bias the solution in either direction! (The center of $s$ **loactes between 1/3 - 2/3 height**)
+- *Don't use* $p$ to bias the solution in either direction! (The center of $s$ **loactes between 1/3 - 2/3 height**)
 
 ![Located in the 1/3 - 2/3 center](./images/image_50.png)
 
-- $\underline{\text{Use }} p$!, When center of $s$ **locates between (0 - 1/3 height) or (2/3 - 1 height)**
+- *Use* $p$!, When center of $s$ **locates between (0 - 1/3 height) or (2/3 - 1 height)**
 
 ![Located in the 0- 1/3 and 2/3 - 1 height](./images/image_51.png)
 
@@ -1170,7 +1170,7 @@ When not to use $p$ to bias partionting? Net $s$ has cells in many groups?
 
 ### Terminal Propagation Example
 
-$\underline{\text{Partitioning must be done breadth-first, not depth-first}}$
+*Partitioning must be done breadth-first, not depth-first*
 
 ![Node Abstraction](./images/image_53.png)
 
@@ -1195,7 +1195,7 @@ Start with vertical cut
 
 **Cut 3**
 
-Now $\underline{\text{terminal propagation occurs}}$
+Now *terminal propagation occurs*
 
 - Two terminals are propagated ($p1$ and $p2$) and are "pulling" nodes
 
@@ -1221,7 +1221,7 @@ Now $\underline{\text{terminal propagation occurs}}$
 
 **Cut 4**
 
-$\underline{\text{One terminal propagated}}$
+*One terminal propagated*
 
 - Node $n$ and $j$ connect to $o$, $k$ and $g$: $p1$ **propagated**
 
@@ -1281,7 +1281,7 @@ Definition:
 
 - Process of Solving optimization problems involving quadractic functions
 
-- One seeks to optimize (minimize or maximize) a $\underline{\text{multivariate quadratic function subject to linear constraints}}$ on the variables
+- One seeks to optimize (minimize or maximize) a *multivariate quadratic function subject to linear constraints* on the variables
 
 QP with **n variables** and **m constraints**
 
