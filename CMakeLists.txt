@@ -1,16 +1,16 @@
 cmake_minimum_required(VERSION 3.10)
 project(ECE6133_project)
 
-# C 11 compiler
-set(CMAKE_C_STANDARD 11)
+# C++ 11 compiler
+set(CMAKE_CXX_STANDARD 11)
 
 # Add src code
-add_executable(gpsim 
-    src/main.c
+add_executable(gpsim
+    src/main.cpp
 )
 
 # Include the header files 
-target_include_directories(gpsim PRIVATE 
+target_include_directories(gpsim PRIVATE
     # required osqp.h
     ${CMAKE_CURRENT_SOURCE_DIR}/osqp/include/public
     # generated osqp_configure.h
