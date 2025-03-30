@@ -1721,3 +1721,75 @@ $$y^T = \text{(1.01 1.78 3.08 3.32 0.82 1.44 3.18 0.59 1.57 3.22)}$$
 
 ![QP and Partitioning](./images/image_81.png)
 
+# Steiner Routing
+
+## Routing
+
+### Global routing
+
+- Generate a "loose" route for each net.
+
+- Assign a list of routing regions to each net without specifying the actual layout of wires.
+
+![Global routing](./images/image_82.png)
+
+### Detailed routing
+
+- Finds the actual geometric layout of each net within the assigned routing regions.
+
+![Detailed routing](./images/image_83.png)
+
+## Routing Constraints
+
+**100% routing completion** + **area minimization**, under a set of constraints:
+
+- **Placement constraint**: usually based on fixed placement
+
+- Number of *routing layers*
+
+- **Geometrical constraints**: must *satisfy design rules* (DRC: Design Rule Check)
+
+![Two-layer routing](./images/image_84.png)
+
+![Geometrical constraint](./images/image_85.png)
+
+- **Timing constraints** (performance-driven routing): must satisfy delay constraints (STA: static timing analysis and DTA: dynamic timing analysis)
+
+- Crosstalk
+
+- Process variations
+
+### Graph Models for Global Routing: Grid Graph
+
+Each cell is represented by a vertex.
+
+Two vertices are joined by an edge if the corresponding cells are adjacent to each other.
+
+The occupied cells are represented as filled circles, whereas the others are as clear circles.
+
+![Grid Grpah](./images/image_86.png)
+
+### Global-Routing Problem
+
+Given a netlist $N = {N_1, N_2, ..., N_n}$, a routing graph $G = (V, E)$, find a Steiner tree $T_i$ for each net $N_i$, $1 \le i \le n$, such that $U(e_j) \le c(e_j)$, for any $e_j ∈ E$ and $\sum_{i=1}^{n}L(T_i)$ is minimized,
+
+where 
+
+$c(e_j)$: capacity of edge $e_j$
+
+$x_{ij} = 1$ if $e_j$ is in $T_i$; $x_{ij} = 0$ otherwise;
+
+$U(e_j) = \sum_{i=1}^{n}x_{ij}$: # of wires that pass through the channel corresponding to edge $e_j$
+
+$L(T_i)$: total wirelength of Steiner tree $T_i$.
+
+For high-performance, the maximum wirelength ($max_{i=1}^{n} L(T_i)$) is minized.
+
+### Classification of Global-Routing Algorithm
+
+- **Sequential approach**: Assigns priority to nets; routes one net at a time based on its priority (net ordering)
+
+- **Concurrent approach**: All nets are considered at the same time (complexity)
+
+![Global-routing algorithm](./images/image_87.png)
+
