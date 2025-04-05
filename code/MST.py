@@ -1,12 +1,12 @@
 from itertools import combinations
 
 points = {
-    'a': (0, 3),
-    'b': (2, 5),
-    'c': (3, 2),
-    'd': (5, 7),
-    'e': (6, 3),
-    'f': (6, 0),
+    's': (2, 6),
+    'a': (5, 4),
+    'b': (7, 1),
+    'c': (7, 2),
+    'd': (6, 6),
+    'e': (1, 2),
 }
 
 def find_MST(points):
@@ -59,7 +59,7 @@ def find_MST(points):
     print(f"the MST is {MST}, and the total length is {sum_distance}")
 
 if __name__ == '__main__':
-    stiener_points = [('p1', (2,3)), ('p2', (5,3)), ('p3', (3,3))]
+    stiener_points = [('p', (5,2))]
     for sp in stiener_points:
         points[sp[0]] = sp[1]
         find_MST(points)
