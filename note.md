@@ -1793,3 +1793,269 @@ For high-performance, the maximum wirelength ($max_{i=1}^{n} L(T_i)$) is minized
 
 ![Global-routing algorithm](./images/image_87.png)
 
+## Spanning Tree
+
+Problem Formulation:
+
+Given a graph $G = (V, E)$, select a subset $V' ⊆ V$, such that $V'$ has property $P$.
+
+### Minimum Spanning Tree
+
+Problem Formulaton:
+
+Given an edge-weighted graph $G = (V, E)$, select a subset of edges $E' ⊆ E$ such that $E'$ induces a tree and the total cost of edges $\sum_{e_i∈E'}wt(e_i)$, is minimum over all such trees, where $wt(e_i)$ is the cost or weigt of the edge $e_i$.
+
+## Steiner Trees
+
+Problem formulation:
+
+Given an edge weighted graph $G = (V, E)$ and a subset $D ⊆ V$, select a subset $V' ⊆ V$, such that $D ⊆ V'$ and $V'$ induces a tree of minimum cost over all such trees.
+
+The set $D$ is referred to as the set of $demand points$ and the set $V' - D$ is referred to as *Steiner points*.
+
+- Used in the **global routing** of multi-terminal nets.
+
+### Comparsion of MST and Stenier Trees
+
+Both problems try to "span" nodes in the given graph.
+
+- Goal is to minimize the total edge weight
+
+- MST: span all nodes
+
+- Stenier tree: span only a designated subset of nodes. We can use "extra" nodes (=**steiner nodes**) if they help.
+
+### Different Steiner trees constructed from a MST
+
+**The ratio of the cost of a rectilinear MST to that of an optimal RST is no greater than 3/2.**
+
+![Resolution from RST to Stiener Trees](./images/image_88.png)
+
+## The 1-Stiener Problem
+
+Definition: We denote the minimum spanning tree over a point set P by $MST(P)$, and use $c(MST(P))$ to denote the cost of the MST on point set $P$. Given a point set P = {$p1$, ..., $pn$}. A **1-steiner point** is any point x such that $c(MST(P ∪ {x}))$ is minimized, with $(c(MST(P ∪ {x})))$ < $c(MST(P))$. A 1-Stinener tree is the minimum spanning tree over $P ∪ {x}$.
+
+### 1-Steiner by Kahng/Robins
+
+Iterative 1-Steiner Insertion Algorithm
+
+- Keep adding 1-Steiner point one-by-one until no more again.
+
+By the result of Hanan, we can find a 1-Steiner point by constructing a new MST on $n+1$ points for each element in the Steiner candidate set, then picking the candidate which results in the shortest MST.
+
+But the time complexity is very high: 
+
+Naive implementation: $O(n^2 \times nlogn \times n)$
+
+Why $n^2$, because you have to consider any possible steiner point' connection with current points.
+
+Why $nlogn$, because you have to consider a MST(a kind of sorted method, and best time complexity for sorted algorithm is nlogn) to estimate the wirelength.
+
+Why $n$, because you have $n$ points.
+
+Even with Sophisticated implemenation: $O(n^3)$
+
+## 1-Steiner Routing by Kahng/Robins example
+
+Perform 1-Steiner Routing by Kahng/Robins
+
+- Need an initial MST: wirelength is 20
+
+- 16 locations for Steiner points
+
+![Initial States](./images/image_89.png)
+
+### Add 1st Steiner Point
+
+There are six 1-Stenier points
+
+![First three cases for 1 steiner point added](./images/image_90.png)
+
+![Second three cases for 1 steiner point added](./images/image_91.png)
+
+Two best solutions: choose (c) randomly.
+
+### Add 2nd Steiner Point
+
+Need to break tie again
+
+- Note that (a) and (b) do not contain any more 1-Steiner point: so we choose (c)
+
+![2nd steiner point is added](./images/image_92.png)
+
+### Add 3rd Steiner Point
+
+Tree completed: **all edges are rectilinearized**
+
+Overall wirelength reduction: $20 - 16 = 4$
+
+![3rd steiner point is added](./images/image_93.png)
+
+## Kahng/Robins Speedup Techniques
+
+**Random variant**:
+
+- Instead of choosing the best gain Steiner point in each iteration, just pick the first one found.
+
+- Time spent on each step is less, but more Steiner points need to be added.
+
+**Prune out bad candidates**
+
+- After the first iteration, the Hanan gird points that gave no gain were removed.
+
+- This improved practical time complexity.
+
+## 1-Steiner by Borah/Owens/Irwin
+
+Interesting Obseravtion
+
+- Our edge-based algorithm is based on **connecting a node to the nearest point on the rectangular layout of an edge** in the tree and **removing the longest edge** in the loop thus formed.
+
+### Gain Computation
+
+Things to do
+
+1. add node $p$
+
+2. remove edge $e1$
+
+3. remove edge $e2$
+
+4. add edge connecting $p$ to $p1$
+
+5. add edge connecting $p$ to $p2$
+
+6. add edge connecting $p$ to $p3$
+
+Thus, gain is 
+
+$$gain = length(e_2) - length(p, p1)$$
+
+![Gain formula](./images/image_94.png)
+
+### Overall Algorithm
+
+**Multi-pass Heurstic**
+
+- Entire algorithm can be repeated
+
+Algorithm Edge-based-Steiner()
+
+```pesudo
+Begin
+    1. Compute the rectilinear minimum spanning tree of the set of nodes
+    2. Compute all possible <node, edge> pairs that give positive gain
+    3. Sort all the pairs in descencding order of gain
+    4. While (there are pairs with gain) do
+        if (the two edges to be replaced exist in the tree) then
+            replace the pair of edges with three new edges and a new node
+        end if
+    End-while
+End
+```
+
+### Example of 1-Stenier Routing by Borah/Owens/Irwin
+
+Perform a single pass of Borah/Owens/Irwin
+
+- Initial MST has 5 edges with wirelength of 20
+
+- Need to compute **the max-gain (node, edge) pair for each edge** in this MST
+
+### Best Pair for (a, c)
+
+We first let $p1 = b$ and $e_1 = (a, c)$. Next, we compute the shortest **Manhatten distance** between $p1$ and a "rectilinear layout" of $e1$, which is 2 in this case.
+
+The node $p$ is the nearest point on this rectilinear layout of $e1$ to $p1$. Next, we look for $e2$, the longest edge on $p1-to-a$ path, which is $e2 = (b,c)$. Thus,
+
+$$gain\{b, (a,c)\} = length(e_2) - length(p, p1) = 4 - 2 = 2$$
+
+![Best Pair for (a,c)](./images/image_95.png)
+
+### Best Pair for (b, c)
+
+Three nodes can pari up with (b, c)
+
+$gain\{a, (b,c)\} = length(a,c) - length(p,a) = 4 - 2 = 2$
+
+![gain{a, (b,c)}](./images/image_96.png)
+
+$gain\{d, (b,c)\} = length(b,d) - length(p,d) = 5 - 4 = 1$
+
+![gain{d, (b,c)}](./images/image_97.png)
+
+$gain\{e, (b,c)\} = length(c,e) - length(p,e) = 4 - 3 = 1$
+
+![gain{e, (b,c)}](./images/image_98.png)
+
+All three pairs have the same gain
+
+Break ties randomly
+
+### Best Pair for (b, d)
+
+Two nodes can pair up with (b, d)
+
+- both pairs have the same gain
+
+![gain{c, (b,d)}](./images/image_99.png)
+
+![gain{e, (b,d)}](./images/image_100.png)
+
+### Best Pair for (c, e)
+
+Three nodes can pair up with (c, e)
+
+![gain{b, (c,e)}](./images/image_101.png)
+
+![gain{d, (c,e)}](./images/image_102.png)
+
+![gain{f, (c,e)}](./images/image_103.png)
+
+### Best Pair for (e, f)
+
+Can merge with $c$ only
+
+![gain{c, (e,f)}](./images/image_104.png)
+
+### Summary
+
+Max-gain pair table
+
+- Sorted based on gain value
+
+|   pair    |   gain    |   e1  |   e2  |
+|-----------|-----------|-------|-------|
+|{b, (a,c)} |   2       | (a, c)| (b,c) |
+|{a, (b,c)} |   2       | (b, c)| (a,c) |
+|{c, (b,d)} |   1       | (b, d)| (b,c) |
+|{b, (c,e)} |   1       | (c, e)| (b,c) |
+|{c, (e,f)} |   1       | (e, f)| (c,e) |
+
+**First 1-Steiner Point Insertaion**
+
+Choose {b, (a,c)} (max-gain pair)
+
+- Mark $e_1 = (a, c)$, $e_2 = (b, c)$
+
+- Skip {a, (b, c)}, {c, (b, d)}, {b, (c, e)} since **their e1/2 are already marked**.
+
+- Wirelength reduces from 20 to 18
+
+![First 1-Steiner Point insertation](./images/image_105.png)
+
+**Second 1-Steiner Point Insertation**
+
+Choose {c, (e,f)} (last one remaining)
+
+- Wirelength reduces from 18 to 17
+
+![Second 1-Steiner Point insertation](./images/image_106.png)
+
+## Comparsion Kahng/Robins vs Borah/Owens/Irwin
+
+- Kahng/Robins tends to give better results
+
+- Borah/Owens/Irwin runs much faster: $O(n^4logn) \text{ vs } O(n^2)$
+
+ 
