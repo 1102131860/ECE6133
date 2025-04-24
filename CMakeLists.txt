@@ -1,17 +1,46 @@
 cmake_minimum_required(VERSION 3.10)
 project(ECE6133_project)
 
-# C++ 11 compiler
-set(CMAKE_CXX_STANDARD 11)
+# Add DEBUG option
+# cmake -B build -DDEBUG=ON to enable debug
+option(DEBUG "Enable debug output" OFF)
+
+# C++ 17 compiler
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# 检查OSQP库是否存在，不存在时直接用shell脚本构建它
+set(OSQP_LIB_PATH "${CMAKE_CURRENT_SOURCE_DIR}/osqp/build/out/libosqpstatic.a")
+if(NOT EXISTS ${OSQP_LIB_PATH})
+    message(STATUS "OSQP library not found. Building OSQP...")
+    
+    execute_process(
+        COMMAND bash -c "mkdir -p osqp/build && cd osqp/build && cmake .. && cmake --build ."
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        RESULT_VARIABLE OSQP_BUILD_RESULT
+    )
+    
+    if(NOT OSQP_BUILD_RESULT EQUAL 0)
+        message(FATAL_ERROR "Failed to build OSQP library")
+    endif()
+    
+    message(STATUS "OSQP library built successfully")
+endif()
 
 # Add src code
 add_executable(gpsim
+    src/Parser.cpp
+    src/PlacementProblem.cpp
+    src/Partition.cpp
+    src/QPSolver.cpp
     src/main.cpp
 )
 
 # Include the header files 
 target_include_directories(gpsim PRIVATE
-    # required osqp.h
+    # require our head files
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    # require osqp.h
     ${CMAKE_CURRENT_SOURCE_DIR}/osqp/include/public
     # generated osqp_configure.h
     ${CMAKE_CURRENT_SOURCE_DIR}/osqp/build/include/public
@@ -22,6 +51,11 @@ target_link_directories(gpsim PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/osqp/build/out
 
 # Link libraries (osqpstatic and math library)
 target_link_libraries(gpsim PRIVATE osqpstatic m)
+
+# Add debug definition if DEBUG is ON
+if(DEBUG)
+    target_compile_definitions(gpsim PRIVATE DEBUG)
+endif()
 
 # Move executable after build (use rename instead of mv)
 add_custom_command(TARGET gpsim POST_BUILD

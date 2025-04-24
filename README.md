@@ -1,59 +1,68 @@
-# Gordian Placement EDA
+# Gordian Placement Algorithm
 
-## 0. Install Cmake (if already installed, skip it)
+This project implements the Gordian placement algorithm for VLSI cell placement. The algorithm uses a combination of quadratic programming (QP) and recursive partitioning to efficiently place standard cells on a chip.
 
-Check Cmake is installed or not
+## Project Structure
 
-```bash
-cmake --version
-```
+`include/` & `src/`
+  - `main.cpp` - Main implementation of the Gordian algorithm
+  - `Parser.h/cpp` - Parses benchmark circuit files
+  - `PlacementProblem.h/cpp` - Stores circuit data and placement information
+  - `QPSolver.h/cpp` - Implements the quadratic programming solver using OSQP
+  - `Partition.h/cpp` - Implements the partitioning algorithms (Median Cut, KL)
 
-You should see the something like `cmake version 3.26.5`
+`visualize.py` - Visualizes the placement results
 
-If you fail to see it, please install Cmake first.
+## Dependencies
 
-## 1. Configure OSQP library
+- C++ compiler with C++17 support
+- OSQP solver
+- CMake build system
+- Python 3 for visualization
 
-Download the compressed library OSQP from Github (clone the repository)
+## Building the Project
+
+### Download OSQP
 
 ```bash
 git clone https://github.com/osqp/osqp
 ```
 
-Create the `build` directory in the repository and generate cmake configurations inside it
+### Using CMake
 
 ```bash
-cd osqp && cmake -B build
+cmake -B build && cmake --build build
 ```
 
-Compile OSQP source codes, and generate OSQP library inside `build` directory
-
-```
-cmake --build build
-```
-
-The generated static library `libosqpstatic` and dynamic library `libosqp` are in the `build/out`. The configuration file `osqp_configure.h` is in the `build/include/public`. (You don't need to change file path).
-
-Now, the OSQP library is configured.
-
-## 2. Build executable gpsim
-
-Exit from `osqp` repository
- 
-Create a `build` directory and generate cmake configuration inside
+## Running the Program
 
 ```bash
-cd .. && cmake -B build
+./gpsim <benchmark_file> [KL|median]
 ```
 
-Generate the executable file `gpsim`
+Example:
+```bash
+./gpsim benchmarks/StructP/StructP KL
+```
+
+It will put outputs into `output` folder
+
+## Visualizing the Results
+
+### Install required library:
 
 ```bash
-cmake --build build
+pip3 install -r requirements.txt --user
 ```
 
-Now, the `gpsim` executable is built.
+### Visualize:
 
-## 3. Run the program
+```bash
+python3 visualize.py <output_dir> [-o] [images_dir] [--no-connections] [--max-nets] [# of nets]
+```
 
+Example:
 
+```bash
+python3 visualize.py output/structP -o images/structP --max-nets 200
+```
