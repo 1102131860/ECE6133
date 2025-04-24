@@ -43,7 +43,7 @@ cmake --build build
 
 Example:
 ```bash
-./gpsim benchmarks/StructP/StructP KL
+./gpsim benchmarks/structP/structP KL
 ```
 
 It will put outputs into `output` folder
