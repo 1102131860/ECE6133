@@ -24,6 +24,8 @@ This project implements the Gordian placement algorithm for VLSI cell placement.
 
 ### Download OSQP
 
+For submission, the `osqp` has been download, skip this step.
+
 ```bash
 git clone https://github.com/osqp/osqp
 ```
@@ -59,11 +61,11 @@ pip3 install -r requirements.txt --user
 ### Visualize:
 
 ```bash
-python3 visualize.py <output_dir> [-o] [images_dir] [--no-connections] [--max-nets] [# of nets]
+python3 visualize.py <output_dir> [-o] [images_dir] [-i] [level intervals] [--no-connections] [--max-nets] [# of nets]
 ```
 
 Example:
 
 ```bash
-python3 visualize.py output/structP -o images/structP --max-nets 200
+python3 visualize.py output/structP -o images/structP -i 5 --max-nets 200
 ```
