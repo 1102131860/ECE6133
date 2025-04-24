@@ -31,7 +31,8 @@ git clone https://github.com/osqp/osqp
 ### Using CMake
 
 ```bash
-cmake -B build && cmake --build build
+cmake -B build
+cmake --build build
 ```
 
 ## Running the Program

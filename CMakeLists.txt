@@ -9,18 +9,40 @@ option(DEBUG "Enable debug output" OFF)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# 检查OSQP库是否存在，不存在时直接用shell脚本构建它
+# Check if OSQP library exists, build it with shell script if not found
 set(OSQP_LIB_PATH "${CMAKE_CURRENT_SOURCE_DIR}/osqp/build/out/libosqpstatic.a")
 if(NOT EXISTS ${OSQP_LIB_PATH})
     message(STATUS "OSQP library not found. Building OSQP...")
     
+    # Create build directory for OSQP
     execute_process(
-        COMMAND bash -c "mkdir -p osqp/build && cd osqp/build && cmake .. && cmake --build ."
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-        RESULT_VARIABLE OSQP_BUILD_RESULT
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_SOURCE_DIR}/osqp/build
+        RESULT_VARIABLE MKDIR_RESULT
     )
     
-    if(NOT OSQP_BUILD_RESULT EQUAL 0)
+    if(NOT MKDIR_RESULT EQUAL 0)
+        message(FATAL_ERROR "Failed to create build directory for OSQP")
+    endif()
+    
+    # Run CMake configuration for OSQP
+    execute_process(
+        COMMAND ${CMAKE_COMMAND} ..
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/osqp/build
+        RESULT_VARIABLE CMAKE_CONFIG_RESULT
+    )
+    
+    if(NOT CMAKE_CONFIG_RESULT EQUAL 0)
+        message(FATAL_ERROR "Failed to configure OSQP build")
+    endif()
+    
+    # Build OSQP library
+    execute_process(
+        COMMAND ${CMAKE_COMMAND} --build .
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/osqp/build
+        RESULT_VARIABLE CMAKE_BUILD_RESULT
+    )
+    
+    if(NOT CMAKE_BUILD_RESULT EQUAL 0)
         message(FATAL_ERROR "Failed to build OSQP library")
     endif()
     
