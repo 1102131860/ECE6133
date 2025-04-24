@@ -72,7 +72,12 @@ target_include_directories(gpsim PRIVATE
 target_link_directories(gpsim PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/osqp/build/out)
 
 # Link libraries (osqpstatic and math library)
-target_link_libraries(gpsim PRIVATE osqpstatic m)
+# Note: Math library 'm' is only needed on non-Windows platforms
+if(WIN32)
+    target_link_libraries(gpsim PRIVATE osqpstatic)
+else()
+    target_link_libraries(gpsim PRIVATE osqpstatic m)
+endif()
 
 # Add debug definition if DEBUG is ON
 if(DEBUG)
