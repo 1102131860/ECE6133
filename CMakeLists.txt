@@ -84,8 +84,18 @@ if(DEBUG)
     target_compile_definitions(gpsim PRIVATE DEBUG)
 endif()
 
-# Move executable after build (use rename instead of mv)
-add_custom_command(TARGET gpsim POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E rename $<TARGET_FILE:gpsim> ${CMAKE_CURRENT_SOURCE_DIR}/gpsim
-    COMMENT "Move executable gpsim to source directory."
-)
+# Move executable after build
+# Platform-specific handling for executable files
+if(WIN32)
+    # On Windows, move the .exe file to the source directory
+    add_custom_command(TARGET gpsim POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E rename $<TARGET_FILE:gpsim> ${CMAKE_CURRENT_SOURCE_DIR}/gpsim.exe
+        COMMENT "Move executable gpsim.exe to source directory."
+    )
+else()
+    # On Unix systems, move the executable to the source directory without extension
+    add_custom_command(TARGET gpsim POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E rename $<TARGET_FILE:gpsim> ${CMAKE_CURRENT_SOURCE_DIR}/gpsim
+        COMMENT "Move executable gpsim to source directory."
+    )
+endif()
