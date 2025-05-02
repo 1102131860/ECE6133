@@ -1,6 +1,6 @@
 # ECE6133 Physical Automation for VLSI systems
 
-This `main/tree` has study notes from the course. There are some topics covered in the `note.md`
+This `tree/main` has study notes from the course. There are some topics covered in the `note.md`
 
 - Partitioning
 
@@ -28,4 +28,4 @@ This `main/tree` has study notes from the course. There are some topics covered 
 
 The `code` folder only has some basic and small functions of `KL`, `FM` and `MST` but very useful for building a large project.
 
-There is a project under the tree `project`. Refer to that tree to see more details.
+There is a project under the `tree/project`. Refer to that tree to see more details.
